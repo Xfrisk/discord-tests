@@ -15,21 +15,28 @@ class MyClient(commands.Bot):
         )
 
     async def setup_hook(self):
-        base_path = Path("bot/cogs")
+        current_dir = Path(__file__).parent
+        base_path = current_dir / "cogs"
+        
+        project_root = current_dir.parent
 
+        print("--- loading cogs ---")
         for file in base_path.rglob("*.py"):
             if file.name.startswith("__"):
                 continue
 
-            relative_path = file.relative_to(Path.cwd() if Path.cwd().name != "bot" else Path.cwd().parent)
-            module = ".".join(relative_path.with_suffix("").parts)
-
             try:
+                relative_path = file.relative_to(project_root)
+                module = ".".join(relative_path.with_suffix("").parts)
+
                 if module not in self.extensions:
                     await self.load_extension(module)
-                    print(f"✅ Loaded: {module}")
+                    print(f"loaded: {module}")
+                else:
+                    print(f"cog is already loaded: {module}")
             except Exception as err:
-               print(f"❌ Failed {module}: {err}")
+                print(f"error while loading {file.name}: {err}")
+        print("--------------------------")
 
 client = MyClient()
 
