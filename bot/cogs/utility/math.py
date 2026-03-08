@@ -14,7 +14,6 @@ class Math(commands.Cog):
     )
     @app_commands.allowed_installs(users=True, guilds=True)
     @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
-
     async def math(self, ctx: commands.Context, *, expr: str):
         try:
             resultado = calcular(expr)
