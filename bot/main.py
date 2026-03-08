@@ -21,13 +21,15 @@ class MyClient(commands.Bot):
             if file.name.startswith("__"):
                 continue
 
-            module = ".".join(file.with_suffix("").parts)
+            relative_path = file.relative_to(Path.cwd() if Path.cwd().name != "bot" else Path.cwd().parent)
+            module = ".".join(relative_path.with_suffix("").parts)
 
             try:
-                await self.load_extension(module)
-                print(f"loaded module {module}")
+                if module not in self.extensions:
+                    await self.load_extension(module)
+                    print(f"✅ Loaded: {module}")
             except Exception as err:
-                print(f"failed to load module {module}: {err}")
+               print(f"❌ Failed {module}: {err}")
 
 client = MyClient()
 
