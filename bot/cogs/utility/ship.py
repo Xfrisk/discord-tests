@@ -5,6 +5,7 @@ from PIL import Image, ImageDraw, ImageFont
 import aiohttp
 import io
 import random
+import asyncio
 from pathlib import Path
 
 ASSETS_PATH = Path(__file__).parent.parent.parent / "assets" / "ship"
@@ -177,7 +178,8 @@ class Ship(commands.Cog):
             av1 = await fetch_avatar(session, av1_url)
             av2 = await fetch_avatar(session, av2_url)
 
-        img_bytes = make_ship_image(av1, av2, percent, tier)
+        loop = asyncio.get_event_loop()
+        img_bytes = await loop.run_in_executor(None, make_ship_image, av1, av2, percent, tier)
 
         embed = discord.Embed(
             description=(
@@ -188,10 +190,8 @@ class Ship(commands.Cog):
         )
         embed.set_image(url="attachment://ship.png")
 
-        await ctx.send(
-            embed=embed,
-            file=discord.File(img_bytes, filename="ship.png")
-        )
+        file = discord.File(img_bytes, filename="ship.png")
+        await ctx.send(embed=embed, file=file)
 
 
 async def setup(client: commands.Bot):
